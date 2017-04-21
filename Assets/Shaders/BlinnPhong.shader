@@ -11,7 +11,7 @@
 		
 		CGPROGRAM
 		// Physically based Standard lighting model, and enable shadows on all light types
-		#pragma surface surf BlinnPhong
+		#pragma surface surf MyBlinnPhong
 
 		// Use shader model 3.0 target, to get nicer looking lighting
 		#pragma target 3.0
@@ -41,18 +41,17 @@
 			o.Alpha = c.a;
 		}
 
-		fixed4 LightingBlinnPhong(SurfaceOutput s, fixed3 lightDir, half3 viewDir, fixed atten)
+		fixed4 LightingMyBlinnPhong(SurfaceOutput s, fixed3 lightDir, half3 viewDir, fixed atten)
 		{
 			// Reflection vector
+			float3 H = normalize(lightDir + viewDir);
 			float NdotL = max(0, dot(s.Normal, lightDir));
-
-			float3 halfVector = normalize(lightDir + viewDir);
-			float NdotH = max(0, dot(s.Normal, halfVector));
-			float spec = pow(NdotH, _SpecPower) * _SpecularColor;
+			float NdotH = max(0, dot(s.Normal, H));
+			float spec = pow(NdotH, _SpecPower);
 
 			// Final effect
 			float4 c;
-			c.rgb = (s.Albedo * _LightColor0.rgb * NdotL) + (_LightColor0.rgb * _SpecularColor.rgb * spec * atten);
+			c.rgb = (s.Albedo * _LightColor0.rgb * NdotL*atten) + (_LightColor0.rgb * _SpecularColor.rgb * spec);
 			c.a = s.Alpha;
 
 			return c;
